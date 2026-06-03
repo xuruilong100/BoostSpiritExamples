@@ -3,7 +3,7 @@ some Boost.Spirit examples
 
 ## Qi
 
-- [ ] Calc1
+- [x] Calc1
 - [ ] Calc2
 - [ ] Calc3
 - [ ] Calc4

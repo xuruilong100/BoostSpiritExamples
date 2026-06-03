@@ -1,0 +1,13 @@
+BasedOnStyle: Chromium
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+SortIncludes: true
+IncludeCategories:
+  - Regex: '^"'           # 项目自身头文件（双引号）
+    Priority: 1
+  - Regex: '^<boost/.*>'  # Boost 头文件
+    Priority: 2
+  - Regex: '^<.*>'        # 其他角括号头文件（STL/第三方）
+    Priority: 3
