@@ -13,3 +13,4 @@ project ("Qi")
 
 # 包含子项目。
 add_subdirectory ("Calc1")
+add_subdirectory ("Calc2")
