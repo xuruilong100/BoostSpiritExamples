@@ -6,7 +6,7 @@ some Boost.Spirit examples
 - [x] Calc1
 - [x] Calc2
 - [x] Calc3
-- [ ] Calc4
+- [x] Calc4
 - [ ] Calc5
 - [ ] Calc5
 - [ ] Calc6

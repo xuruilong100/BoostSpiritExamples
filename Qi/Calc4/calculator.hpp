@@ -11,36 +11,34 @@
 #define BOOST_SPIRIT_NO_PREDEFINED_TERMINALS
 #endif
 
-#include <boost/phoenix/operator.hpp>
+#include "ast.hpp"
 #include <boost/spirit/include/qi.hpp>
-#include <iostream>
 
 namespace client {
 namespace qi = boost::spirit::qi;
 namespace ascii = boost::spirit::ascii;
 
+///////////////////////////////////////////////////////////////////////////////
+//  The calculator grammar
+///////////////////////////////////////////////////////////////////////////////
 template <typename IT>
-class calculator : public qi::grammar<IT, double, ascii::space_type> {
+class calculator : public qi::grammar<IT, ast::program(), ascii::space_type> {
    public:
     calculator() : calculator::base_type(expression_) {
-        qi::_val_type _val;
-        qi::_1_type _1;
         qi::double_type double_;
         qi::char_type char_;
+        qi::lit_type lit_;
 
-        expression_ = term_[_val = _1] >> *((char_('+') >> term_[_val += _1]) |
-                                            (char_('-') >> term_[_val -= _1]));
+        expression_ = term_ >> *((char_('+') >> term_) | (char_('-') >> term_));
 
-        term_ = factor_[_val = _1] >> *((char_('*') >> factor_[_val *= _1]) |
-                                        (char_('/') >> factor_[_val /= _1]));
+        term_ = factor_ >> *((char_('*') >> factor_) | (char_('/') >> factor_));
 
-        factor_ = double_[_val = _1] |
-                  char_('(') >> expression_[_val = _1] >> char_(')');
+        factor_ = double_ | lit_('(') >> expression_ >> lit_(')');
     }
 
    private:
-    qi::rule<IT, double, ascii::space_type> expression_;
-    qi::rule<IT, double, ascii::space_type> term_;
-    qi::rule<IT, double, ascii::space_type> factor_;
+    qi::rule<IT, ast::program(), ascii::space_type> expression_;
+    qi::rule<IT, ast::program(), ascii::space_type> term_;
+    qi::rule<IT, ast::operand(), ascii::space_type> factor_;
 };
 }  // namespace client

@@ -1,0 +1,18 @@
+﻿# CMakeList.txt: Calc4 的 CMake 项目，在此处包括源代码并定义
+# 项目特定的逻辑。
+#
+
+# 将源代码添加到此项目的可执行文件。
+add_executable (Calc4 
+	"main.cpp" 
+	"ast.hpp"
+	"calculator.hpp")
+
+find_package(Boost REQUIRED)
+target_link_libraries(Calc4 PRIVATE Boost::headers)
+
+if (CMAKE_VERSION VERSION_GREATER 3.12)
+  set_property(TARGET Calc4 PROPERTY CXX_STANDARD 20)
+endif()
+
+# TODO: 如有需要，请添加测试并安装目标。
