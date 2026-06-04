@@ -7,8 +7,7 @@ some Boost.Spirit examples
 - [x] Calc2
 - [x] Calc3
 - [x] Calc4
-- [ ] Calc5
-- [ ] Calc5
+- [x] Calc5
 - [ ] Calc6
 - [ ] Calc7
 - [ ] Calc8
@@ -24,7 +23,6 @@ some Boost.Spirit examples
 - [ ] Calc2
 - [ ] Calc3
 - [ ] Calc4
-- [ ] Calc5
 - [ ] Calc5
 - [ ] Calc6
 - [ ] Calc7
