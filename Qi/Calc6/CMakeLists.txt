@@ -5,11 +5,11 @@
 # 将源代码添加到此项目的可执行文件。
 add_executable (Calc6 
 	"main.cpp" 
+	"vm.cpp"
 	"ast.hpp"
 	"calculator.hpp"
 	"error_handler.hpp"
 	"vm.hpp"
-	"vm.cpp"
 )
 	
 find_package(Boost REQUIRED)
