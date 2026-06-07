@@ -1,0 +1,22 @@
+﻿# CMakeList.txt: Calc6 的 CMake 项目，在此处包括源代码并定义
+# 项目特定的逻辑。
+#
+
+# 将源代码添加到此项目的可执行文件。
+add_executable (Calc6 
+	"main.cpp" 
+	"ast.hpp"
+	"calculator.hpp"
+	"error_handler.hpp"
+	"vm.hpp"
+	"vm.cpp"
+)
+	
+find_package(Boost REQUIRED)
+target_link_libraries(Calc6 PRIVATE Boost::headers)
+
+if (CMAKE_VERSION VERSION_GREATER 3.12)
+  set_property(TARGET Calc6 PROPERTY CXX_STANDARD 20)
+endif()
+
+# TODO: 如有需要，请添加测试并安装目标。
