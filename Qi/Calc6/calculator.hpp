@@ -44,7 +44,7 @@ class calculator
 
         expression_ = term_ >> *((char_('+') > term_) | (char_('-') > term_));
         term_ = factor_ >> *((char_('*') > factor_) | (char_('/') > factor_));
-        factor_ = double_ | lit_('(') > expression_ > lit_(')');
+        factor_ = double_ | (lit_('(') > expression_ > lit_(')'));
 
         // Debugging and error handling and reporting support.
         expression_.name("expression");
