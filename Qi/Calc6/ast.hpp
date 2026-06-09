@@ -38,8 +38,8 @@ struct operation {
 };
 
 struct expression {
-    operand first;
-    std::list<operation> rest;
+    operand first_;
+    std::list<operation> rest_;
 };
 
 // print function for debugging
@@ -53,6 +53,6 @@ BOOST_FUSION_ADAPT_STRUCT(client::ast::operation,  //
                           (char, operator_)        //
                           (client::ast::operand, operand_))
 
-BOOST_FUSION_ADAPT_STRUCT(client::ast::expression,       //
-                          (client::ast::operand, first)  //
-                          (std::list<client::ast::operation>, rest))
+BOOST_FUSION_ADAPT_STRUCT(client::ast::expression,        //
+                          (client::ast::operand, first_)  //
+                          (std::list<client::ast::operation>, rest_))

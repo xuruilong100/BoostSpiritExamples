@@ -47,9 +47,9 @@ class calculator : public qi::grammar<IT, ascii::space_type> {
     static inline auto do_double = [](double n) {
         std::cout << "push " << n << std::endl;
     };
-    static inline auto do_add = []() { std::cout << "add\n"; };
-    static inline auto do_subt = []() { std::cout << "subtract\n"; };
-    static inline auto do_mult = []() { std::cout << "mult\n"; };
-    static inline auto do_div = []() { std::cout << "divide\n"; };
+    static inline auto do_add = []() { std::cout << "add" << std::endl; };
+    static inline auto do_subt = []() { std::cout << "subtract" << std::endl; };
+    static inline auto do_mult = []() { std::cout << "mult" << std::endl; };
+    static inline auto do_div = []() { std::cout << "divide" << std::endl; };
 };
 }  // namespace client

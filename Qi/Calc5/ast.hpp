@@ -29,18 +29,19 @@ namespace client::ast {
 ///////////////////////////////////////////////////////////////////////////
 struct nil {};
 
-struct program;
+struct expression;
 
-using operand = boost::variant<nil, double, boost::recursive_wrapper<program>>;
+using operand =
+    boost::variant<nil, double, boost::recursive_wrapper<expression>>;
 
 struct operation {
     char operator_;
     operand operand_;
 };
 
-struct program {
-    operand first;
-    std::list<operation> rest;
+struct expression {
+    operand first_;
+    std::list<operation> rest_;
 };
 
 // print function for debugging
@@ -54,9 +55,9 @@ BOOST_FUSION_ADAPT_STRUCT(client::ast::operation,  //
                           (char, operator_)        //
                           (client::ast::operand, operand_))
 
-BOOST_FUSION_ADAPT_STRUCT(client::ast::program,          //
-                          (client::ast::operand, first)  //
-                          (std::list<client::ast::operation>, rest))
+BOOST_FUSION_ADAPT_STRUCT(client::ast::expression,        //
+                          (client::ast::operand, first_)  //
+                          (std::list<client::ast::operation>, rest_))
 
 namespace client::ast {
 ///////////////////////////////////////////////////////////////////////////
@@ -66,20 +67,20 @@ class printer {
    public:
     using result_type = void;
 
-    result_type operator()(nil n) const { std::cout << n; }
+    void operator()(nil n) const { std::cout << n; }
 
-    result_type operator()(double n) const { std::cout << n; }
+    void operator()(double n) const { std::cout << n; }
 
-    result_type operator()(program const& x) const {
-        boost::apply_visitor(*this, x.first);
-        for (operation const& oper : x.rest) {
+    void operator()(expression const& x) const {
+        boost::apply_visitor(*this, x.first_);
+        for (operation const& oper : x.rest_) {
             std::cout << ' ';
             this->print(oper);
         }
     }
 
    private:
-    result_type print(operation const& x) const {
+    void print(operation const& x) const {
         boost::apply_visitor(*this, x.operand_);
         switch (x.operator_) {
             case '+':
@@ -103,24 +104,24 @@ class printer {
 ///////////////////////////////////////////////////////////////////////////
 //  The AST evaluator
 ///////////////////////////////////////////////////////////////////////////
-class eval {
+class evaluator {
    public:
     using result_type = double;
 
-    result_type operator()(nil) const { return 0; }
+    double operator()(nil) const { return 0; }
 
-    result_type operator()(double n) const { return n; }
+    double operator()(double n) const { return n; }
 
-    result_type operator()(program const& x) const {
-        double state = boost::apply_visitor(*this, x.first);
-        for (operation const& oper : x.rest) {
+    double operator()(expression const& x) const {
+        double state = boost::apply_visitor(*this, x.first_);
+        for (operation const& oper : x.rest_) {
             state = this->evalue(oper, state);
         }
         return state;
     }
 
    private:
-    result_type evalue(operation const& x, double lhs) const {
+    double evalue(operation const& x, double lhs) const {
         double rhs = boost::apply_visitor(*this, x.operand_);
         switch (x.operator_) {
             case '+':

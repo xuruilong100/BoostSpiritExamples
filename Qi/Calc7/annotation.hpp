@@ -37,7 +37,7 @@ class annotation {
         explicit set_id(std::size_t id) : id_(id) {}
 
         template <typename T>
-        result_type operator()(T& x) const {
+        void operator()(T& x) const {
             if constexpr (std::is_base_of_v<ast::tagged, T>) {
                 x.id = id_;
             }

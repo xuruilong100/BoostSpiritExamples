@@ -12,28 +12,28 @@ int main() {
     using namespace client;
     using iterator_type = std::string::const_iterator;
     using calculator = calculator<iterator_type>;
-    using ast_program = ast::program;
-    using ast_print = ast::printer;
-    using ast_eval = ast::eval;
+    using ast::evaluator;
+    using ast::expression;
+    using ast::printer;
 
     std::string str{"1.1 * 2.2 - (3.3 + 4.4) + -1.1"};
     double expected = 1.1 * 2.2 - (3.3 + 4.4) + -1.1;
 
-    calculator calc;      // Our grammar
-    ast_program program;  // Our program (AST)
-    ast_print print;      // Prints the program
-    ast_eval eval;        // Evaluates the program
+    calculator calc;  // Our grammar
+    expression expr;  // Our expression (AST)
+    printer print;    // Prints the expression
+    evaluator eval;   // Evaluates the expression
 
     auto iter = str.cbegin();
     auto end = str.cend();
     boost::spirit::ascii::space_type space;
-    bool r = phrase_parse(iter, end, calc, space, program);
+    bool r = phrase_parse(iter, end, calc, space, expr);
 
     if (r && iter == end) {
         std::cout << "-------------------------\n";
         std::cout << "Parsing succeeded\n";
-        print(program);
-        std::cout << "\nResult: " << eval(program);
+        print(expr);
+        std::cout << "\nResult: " << eval(expr);
         std::cout << "\nExpected: " << expected << std::endl;
         std::cout << "-------------------------\n";
     } else {

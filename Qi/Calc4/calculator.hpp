@@ -27,7 +27,8 @@ namespace ascii = boost::spirit::ascii;
 //  The calculator grammar
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IT>
-class calculator : public qi::grammar<IT, ast::program(), ascii::space_type> {
+class calculator
+    : public qi::grammar<IT, ast::expression(), ascii::space_type> {
    public:
     calculator() : calculator::base_type(expression_) {
         qi::double_type double_;
@@ -42,8 +43,8 @@ class calculator : public qi::grammar<IT, ast::program(), ascii::space_type> {
     }
 
    private:
-    qi::rule<IT, ast::program(), ascii::space_type> expression_;
-    qi::rule<IT, ast::program(), ascii::space_type> term_;
+    qi::rule<IT, ast::expression(), ascii::space_type> expression_;
+    qi::rule<IT, ast::expression(), ascii::space_type> term_;
     qi::rule<IT, ast::operand(), ascii::space_type> factor_;
 };
 }  // namespace client

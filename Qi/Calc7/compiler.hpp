@@ -76,15 +76,15 @@ class compiler {
             "Error! ", _2, phx::cref(error_handler.iters)[_1]);
     }
 
-    result_type operator()(ast::nil) const { return false; }
-    result_type operator()(double x) const;
-    result_type operator()(ast::variable const& x) const;
-    result_type operator()(ast::operation const& x) const;
-    result_type operator()(ast::signed_ const& x) const;
-    result_type operator()(ast::expression const& x) const;
-    result_type operator()(ast::assignment const& x) const;
-    result_type operator()(ast::variable_declaration const& x) const;
-    result_type operator()(ast::statement_list const& x) const;
+    bool operator()(ast::nil) const { return false; }
+    bool operator()(double x) const;
+    bool operator()(ast::variable const& x) const;
+    bool operator()(ast::operation const& x) const;
+    bool operator()(ast::signed_ const& x) const;
+    bool operator()(ast::expression const& x) const;
+    bool operator()(ast::assignment const& x) const;
+    bool operator()(ast::variable_declaration const& x) const;
+    bool operator()(ast::statement_list const& x) const;
 
    private:
     client::code_gen::program& program_;

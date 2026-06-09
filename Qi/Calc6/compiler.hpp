@@ -31,19 +31,19 @@ class compiler {
 
     explicit compiler(std::vector<double>& code) : code_(code) {}
 
-    result_type operator()(ast::nil) const {
+    void operator()(ast::nil) const {
         // No code to generate for nil
     }
 
-    result_type operator()(double n) const {
+    void operator()(double n) const {
         using enum byte_code;
         code_.push_back(static_cast<double>(op_double));
         code_.push_back(n);
     }
 
-    result_type operator()(ast::expression const& x) const {
-        boost::apply_visitor(*this, x.first);
-        for (const auto& oper : x.rest) {
+    void operator()(ast::expression const& x) const {
+        boost::apply_visitor(*this, x.first_);
+        for (const auto& oper : x.rest_) {
             this->compile(oper);
         }
     }
@@ -51,7 +51,7 @@ class compiler {
    private:
     std::vector<double>& code_;
 
-    result_type compile(ast::operation const& x) const {
+    void compile(ast::operation const& x) const {
         boost::apply_visitor(*this, x.operand_);
         switch (x.operator_) {
             using enum byte_code;
