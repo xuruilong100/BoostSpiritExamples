@@ -17,10 +17,9 @@
 #endif
 
 #include "ast.hpp"
-#include <boost/mpl/bool.hpp>
-#include <boost/type_traits/is_base_of.hpp>
 #include <boost/variant/apply_visitor.hpp>
-#include <map>
+#include <type_traits>
+#include <vector>
 
 namespace client {
 ///////////////////////////////////////////////////////////////////////////////
@@ -29,49 +28,46 @@ namespace client {
 //  program is being compiled.
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IT>
-struct annotation {
+class annotation {
+   private:
+    class set_id {
+       public:
+        using result_type = void;
+
+        explicit set_id(std::size_t id) : id_(id) {}
+
+        template <typename T>
+        void operator()(T& x) const {
+            if constexpr (std::is_base_of_v<ast::tagged, T>) {
+                x.id_ = id_;
+            }
+        }
+
+       private:
+        std::size_t id_;
+    };
+
+   public:
     template <typename, typename>
     struct result {
         using type = void;
     };
 
-    std::vector<IT>& iters;
-    annotation(std::vector<IT>& iters) : iters(iters) {}
-
-    struct set_id {
-        using result_type = void;
-
-        int id;
-        set_id(int id) : id(id) {}
-
-        template <typename T>
-        void operator()(T& x) const {
-            this->dispatch(x, boost::is_base_of<ast::tagged, T>());
-        }
-
-        // This will catch all nodes except those inheriting from ast::tagged
-        template <typename T>
-        void dispatch(T& x, boost::mpl::false_) const {
-            // (no-op) no need for tags
-        }
-
-        // This will catch all nodes inheriting from ast::tagged
-        template <typename T>
-        void dispatch(T& x, boost::mpl::true_) const {
-            x.id = id;
-        }
-    };
+    explicit annotation(std::vector<IT>& iters) : iters_(iters) {}
 
     void operator()(ast::operand& ast, IT pos) const {
-        int id = iters.size();
-        iters.push_back(pos);
+        auto id = iters_.size();
+        iters_.push_back(pos);
         boost::apply_visitor(set_id(id), ast);
     }
 
     void operator()(ast::assignment& ast, IT pos) const {
-        int id = iters.size();
-        iters.push_back(pos);
-        ast.lhs.id = id;
+        auto id = iters_.size();
+        iters_.push_back(pos);
+        ast.lhs_.id_ = id;
     }
+
+   private:
+    std::vector<IT>& iters_;
 };
 }  // namespace client

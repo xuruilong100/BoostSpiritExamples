@@ -32,7 +32,7 @@ class error_handler {
         using type = void;
     };
 
-    error_handler(IT first, IT last) : first(first), last(last) {}
+    error_handler(IT first, IT last) : first_(first), last_(last) {}
 
     template <typename What>
     void operator()(std::string_view message,
@@ -40,7 +40,7 @@ class error_handler {
                     IT err_pos) const {
         std::size_t line;
         IT line_start = get_pos(err_pos, line);
-        if (err_pos != last) {
+        if (err_pos != last_) {
             std::cout << message << what << " line " << line << ':'
                       << std::endl;
             std::cout << get_line(line_start) << std::endl;
@@ -56,22 +56,20 @@ class error_handler {
     std::vector<IT> iters;
 
    private:
-    IT first;
-    IT last;
+    IT first_;
+    IT last_;
 
     IT get_pos(IT err_pos, std::size_t& line) const {
         line = 1;
-        IT i = first;
-        IT line_start = first;
+        IT i = first_;
+        IT line_start = first_;
         while (i != err_pos) {
             bool eol = false;
-            if (i != err_pos && *i == '\r')  // CR
-            {
+            if (i != err_pos && *i == '\r') {  // CR
                 eol = true;
                 line_start = ++i;
             }
-            if (i != err_pos && *i == '\n')  // LF
-            {
+            if (i != err_pos && *i == '\n') {  // LF
                 eol = true;
                 line_start = ++i;
             }
@@ -86,7 +84,7 @@ class error_handler {
     std::string get_line(IT err_pos) const {
         IT i = err_pos;
         // position i to the next EOL
-        while (i != last && (*i != '\r' && *i != '\n'))
+        while (i != last_ && (*i != '\r' && *i != '\n'))
             ++i;
         return std::string(err_pos, i);
     }

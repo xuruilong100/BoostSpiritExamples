@@ -23,6 +23,7 @@ int main() {
     while (b < 10.5) {
         b = b + 1.1;
     }
+    double c = a / b;
     std::string source{
         "var a = 1.3;"
         "var b = 2.4;"
@@ -33,7 +34,8 @@ int main() {
         "}"
         "while (b < 10.5) {"
         "   b = b + 1.1;"
-        "}"};
+        "}"
+        "var c = a / b;"};
 
     iterator_type iter = source.cbegin();
     iterator_type end = source.cend();
@@ -49,8 +51,6 @@ int main() {
     boost::spirit::ascii::space_type space;
     bool success = phrase_parse(iter, end, parser, space, ast);
 
-    std::cout << "-------------------------\n";
-
     if (success && iter == end) {
         if (compile.start(ast)) {
             std::cout << "Success\n";
@@ -63,10 +63,11 @@ int main() {
 
             std::cout << "-------------------------\n";
             std::cout << "Results------------------\n\n";
-            program.print_variables(vm.stack);
+            program.print_variables(vm.get_stack());
             std::cout << "Expected results:\n";
             std::cout << "    a: " << a << "\n";
             std::cout << "    b: " << b << "\n";
+            std::cout << "    c: " << c << "\n";
         } else {
             std::cout << "Compile failure\n";
         }

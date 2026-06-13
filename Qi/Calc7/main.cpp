@@ -38,9 +38,9 @@ int main() {
     code_gen::compiler compile(program, error_handler);      // Our compiler
 
     boost::spirit::ascii::space_type space;
+    bool success = phrase_parse(iter, end, parser, space, ast);
 
-    if (bool success = phrase_parse(iter, end, parser, space, ast);
-        success && iter == end) {
+    if (success && iter == end) {
         if (compile(ast)) {
             std::cout << "Success\n";
             std::cout << "-------------------------\n";

@@ -8,14 +8,14 @@
 #include "vm.hpp"
 
 namespace client {
-double vmachine::execute(std::vector<double> const& code,
-                         std::vector<double>::const_iterator pc,
-                         std::vector<double>::iterator frame_ptr) {
-    auto stack_ptr = frame_ptr;
+void vmachine::execute(std::vector<double> const& code) {
+    auto code_ptr = code.begin();
+    auto locals = stack_.begin();
+    auto stack_ptr = stack_.begin();
 
-    while (pc != code.end()) {
-        auto raw_opcode = *pc;
-        ++pc;
+    while (code_ptr != code.end()) {
+        auto raw_opcode = *code_ptr;
+        ++code_ptr;
         auto opcode = static_cast<byte_code>(raw_opcode);
         switch (opcode) {
             using enum byte_code;
@@ -88,70 +88,56 @@ double vmachine::execute(std::vector<double> const& code,
                 break;
 
             case op_load: {
-                auto idx = static_cast<int>(*pc);
-                ++pc;
-                *stack_ptr = frame_ptr[idx];
+                auto idx = static_cast<int>(*code_ptr);
+                ++code_ptr;
+                *stack_ptr = locals[idx];
                 ++stack_ptr;
             } break;
 
             case op_store: {
                 --stack_ptr;
-                auto idx = static_cast<int>(*pc);
-                ++pc;
-                frame_ptr[idx] = stack_ptr[0];
+                auto idx = static_cast<int>(*code_ptr);
+                ++code_ptr;
+                locals[idx] = stack_ptr[0];
             } break;
 
             case op_double: {
-                *stack_ptr = *pc;
+                *stack_ptr = *code_ptr;
                 ++stack_ptr;
-                ++pc;
+                ++code_ptr;
             } break;
 
             case op_true:
-                *stack_ptr++ = true;
+                *stack_ptr = true;
+                ++stack_ptr;
                 break;
 
             case op_false:
-                *stack_ptr++ = false;
+                *stack_ptr = false;
+                ++stack_ptr;
                 break;
 
-            case op_jump:
-                pc += *pc;
-                break;
+            case op_jump: {
+                auto idx = static_cast<int>(*code_ptr);
+                code_ptr += idx;
+            } break;
 
-            case op_jump_if:
-                if (!bool(stack_ptr[-1]))
-                    pc += static_cast<int>(*pc);
+            case op_jump_if: {
+                if (!bool(stack_ptr[-1])) {
+                    auto idx = static_cast<int>(*code_ptr);
+                    code_ptr += idx;
+                }
                 else
-                    ++pc;
+                    ++code_ptr;
                 --stack_ptr;
-                break;
+            } break;
 
             case op_stk_adj: {
-                stack_ptr = stack.begin() + static_cast<int>(*pc);
-                ++pc;
+                auto idx = static_cast<int>(*code_ptr);
+                stack_ptr = stack_.begin() + idx;
+                ++code_ptr;
             } break;
-
-            case op_call: {
-                int nargs = static_cast<int>(*pc);
-                ++pc;
-                int jump = static_cast<int>(*pc);
-                ++pc;
-
-                // a function call is a recursive call to execute
-                double r =
-                    execute(code, code.begin() + jump, stack_ptr - nargs);
-
-                // cleanup after return from function
-                stack_ptr[-nargs] = r;     //  get return value
-                stack_ptr -= (nargs - 1);  //  the stack will now contain
-                                           //  the return value
-            } break;
-
-            case op_return:
-                return stack_ptr[-1];
         }
     }
-    return -1;
 }
 }  // namespace client

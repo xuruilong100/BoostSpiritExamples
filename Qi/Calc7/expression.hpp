@@ -105,7 +105,7 @@ expression<IT>::expression(error_handler<IT>& error_handler)
     on_error<fail>(expr_, eh("Error! Expecting ", _4, _3));
 
     // Annotation: on success in primary_expr_, call annotation.
-    annotation_function af(client::annotation<IT>(error_handler.iters));
+    annotation_function af(annotation<IT>(error_handler.iters));
     on_success(primary_expr_, af(_val, _1));
 }
 }  // namespace client::parser

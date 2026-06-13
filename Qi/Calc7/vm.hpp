@@ -37,14 +37,12 @@ enum class byte_code {
 
 class vmachine {
    public:
-    explicit vmachine(std::size_t stackSize = 4096)
-        : stack_(stackSize), stack_ptr_(stack_.begin()) {}
+    explicit vmachine(std::size_t stackSize = 4096) : stack_(stackSize) {}
 
     void execute(const std::vector<double>& code);
-    const std::vector<double>& get_stack() const { return stack_; };
+    const auto& get_stack() const { return stack_; };
 
    private:
     std::vector<double> stack_;
-    std::vector<double>::iterator stack_ptr_;
 };
 }  // namespace client

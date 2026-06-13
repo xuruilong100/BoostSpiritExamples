@@ -205,10 +205,10 @@ bool compiler::operator()(bool x) const {
 
 bool compiler::operator()(ast::variable const& x) const {
     using enum byte_code;
-    const auto* p = program.find_var(x.name);
+    const auto* p = program.find_var(x.name_);
     if (p == nullptr) {
-        std::cout << x.id << std::endl;
-        error_handler(x.id, "Undeclared variable: " + x.name);
+        std::cout << x.id_ << std::endl;
+        error_handler(x.id_, "Undeclared variable: " + x.name_);
         return false;
     }
     program.op(op_load, static_cast<double>(*p));
@@ -284,9 +284,9 @@ bool compiler::operator()(ast::unary const& x) const {
 }
 
 bool compiler::operator()(ast::expression const& x) const {
-    if (!boost::apply_visitor(*this, x.first))
+    if (!boost::apply_visitor(*this, x.first_))
         return false;
-    for (const auto& oper : x.rest) {
+    for (const auto& oper : x.rest_) {
         if (!(*this)(oper)) {
             return false;
         }
@@ -296,12 +296,12 @@ bool compiler::operator()(ast::expression const& x) const {
 
 bool compiler::operator()(ast::assignment const& x) const {
     using enum byte_code;
-    if (!(*this)(x.rhs))
+    if (!(*this)(x.rhs_))
         return false;
-    const auto* p = program.find_var(x.lhs.name);
+    const auto* p = program.find_var(x.lhs_.name_);
     if (p == nullptr) {
-        std::cout << x.lhs.id << std::endl;
-        error_handler(x.lhs.id, "Undeclared variable: " + x.lhs.name);
+        std::cout << x.lhs_.id_ << std::endl;
+        error_handler(x.lhs_.id_, "Undeclared variable: " + x.lhs_.name_);
         return false;
     }
     program.op(op_store, static_cast<double>(*p));
@@ -310,18 +310,18 @@ bool compiler::operator()(ast::assignment const& x) const {
 
 bool compiler::operator()(ast::variable_declaration const& x) const {
     using enum byte_code;
-    const auto* p = program.find_var(x.assign.lhs.name);
+    const auto* p = program.find_var(x.assign_.lhs_.name_);
     if (p != nullptr) {
-        std::cout << x.assign.lhs.id << std::endl;
-        error_handler(x.assign.lhs.id,
-                      "Duplicate variable: " + x.assign.lhs.name);
+        std::cout << x.assign_.lhs_.id_ << std::endl;
+        error_handler(x.assign_.lhs_.id_,
+                      "Duplicate variable: " + x.assign_.lhs_.name_);
         return false;
     }
-    bool r = (*this)(x.assign.rhs);
+    bool r = (*this)(x.assign_.rhs_);
     if (r) {  // don't add the variable if the RHS fails
-        program.add_var(x.assign.lhs.name);
+        program.add_var(x.assign_.lhs_.name_);
         program.op(op_store,
-                   static_cast<double>(*program.find_var(x.assign.lhs.name)));
+                   static_cast<double>(*program.find_var(x.assign_.lhs_.name_)));
     }
     return r;
 }
@@ -340,11 +340,11 @@ bool compiler::operator()(ast::statement_list const& x) const {
 
 bool compiler::operator()(ast::if_statement const& x) const {
     using enum byte_code;
-    if (!(*this)(x.condition))
+    if (!(*this)(x.condition_))
         return false;
     program.op(op_jump_if, 0);              // we shall fill this (0) in later
     std::size_t skip = program.size() - 1;  // mark its position
-    if (!(*this)(x.then))
+    if (!(*this)(x.then_))
         return false;
     program[skip] = static_cast<double>(program.size() - skip);
     // now we know where to jump to (after the if branch)
@@ -365,11 +365,11 @@ bool compiler::operator()(ast::if_statement const& x) const {
 bool compiler::operator()(ast::while_statement const& x) const {
     using enum byte_code;
     std::size_t loop = program.size();  // mark our position
-    if (!(*this)(x.condition))
+    if (!(*this)(x.condition_))
         return false;
     program.op(op_jump_if, 0);              // we shall fill this (0) in later
     std::size_t exit = program.size() - 1;  // mark its position
-    if (!(*this)(x.body))
+    if (!(*this)(x.body_))
         return false;
     program.op(op_jump,
                static_cast<double>(loop - 1) -

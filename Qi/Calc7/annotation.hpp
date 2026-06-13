@@ -39,7 +39,7 @@ class annotation {
         template <typename T>
         void operator()(T& x) const {
             if constexpr (std::is_base_of_v<ast::tagged, T>) {
-                x.id = id_;
+                x.id_ = id_;
             }
         }
 
@@ -64,7 +64,7 @@ class annotation {
     void operator()(ast::assignment& ast, IT pos) const {
         auto id = iters_.size();
         iters_.push_back(pos);
-        ast.lhs.id = id;
+        ast.lhs_.id_ = id;
     }
 
    private:

@@ -48,8 +48,7 @@ void vmachine::execute(std::vector<double> const& code) {
                 ++code_ptr;
                 *stack_ptr_ = value;
                 ++stack_ptr_;
-                break;
-            }
+            } break;
         }
     }
 }

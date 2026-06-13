@@ -28,9 +28,9 @@ namespace client::ast {
 //  The AST
 ///////////////////////////////////////////////////////////////////////////
 struct tagged {
-    int id;  // Used to annotate the AST with the iterator position.
-             // This id is used as a key to a map<int, IT>
-             // (not really part of the AST.)
+    std::size_t id_;  // Used to annotate the AST with the iterator position.
+                      // This id is used as a key to a map<int, IT>
+                      // (not really part of the AST.)
 };
 
 struct nil {};
@@ -38,8 +38,9 @@ struct unary;
 struct expression;
 
 struct variable : tagged {
-    variable(std::string const& name = "") : name(name) {}
-    std::string name;
+    variable() = default;
+    variable(std::string const& name) : name_(name) {}
+    std::string name_;
 };
 
 using operand = boost::variant<nil,
@@ -78,17 +79,17 @@ struct operation {
 };
 
 struct expression {
-    operand first;
-    std::list<operation> rest;
+    operand first_;
+    std::list<operation> rest_;
 };
 
 struct assignment {
-    variable lhs;
-    expression rhs;
+    variable lhs_;
+    expression rhs_;
 };
 
 struct variable_declaration {
-    assignment assign;
+    assignment assign_;
 };
 
 struct if_statement;
@@ -104,14 +105,14 @@ using statement = boost::variant<variable_declaration,
 struct statement_list : std::list<statement> {};
 
 struct if_statement {
-    expression condition;
-    statement then;
+    expression condition_;
+    statement then_;
     boost::optional<statement> else_;
 };
 
 struct while_statement {
-    expression condition;
-    statement body;
+    expression condition_;
+    statement body_;
 };
 
 // print functions for debugging
@@ -120,36 +121,35 @@ inline std::ostream& operator<<(std::ostream& out, nil) {
     return out;
 }
 inline std::ostream& operator<<(std::ostream& out, variable const& var) {
-    out << var.name;
+    out << var.name_;
     return out;
 }
 }  // namespace client::ast
 
-BOOST_FUSION_ADAPT_STRUCT(client::ast::unary,
-                          (client::ast::optoken,
-                           operator_)(client::ast::operand, operand_))
+BOOST_FUSION_ADAPT_STRUCT(client::ast::unary,                //
+                          (client::ast::optoken, operator_)  //
+                          (client::ast::operand, operand_))
 
-BOOST_FUSION_ADAPT_STRUCT(client::ast::operation,
-                          (client::ast::optoken,
-                           operator_)(client::ast::operand, operand_))
+BOOST_FUSION_ADAPT_STRUCT(client::ast::operation,            //
+                          (client::ast::optoken, operator_)  //
+                          (client::ast::operand, operand_))
 
-BOOST_FUSION_ADAPT_STRUCT(client::ast::expression,
-                          (client::ast::operand,
-                           first)(std::list<client::ast::operation>, rest))
+BOOST_FUSION_ADAPT_STRUCT(client::ast::expression,        //
+                          (client::ast::operand, first_)  //
+                          (std::list<client::ast::operation>, rest_))
 
-BOOST_FUSION_ADAPT_STRUCT(client::ast::variable_declaration,
-                          (client::ast::assignment, assign))
+BOOST_FUSION_ADAPT_STRUCT(client::ast::variable_declaration,  //
+                          (client::ast::assignment, assign_))
 
-BOOST_FUSION_ADAPT_STRUCT(client::ast::assignment,
-                          (client::ast::variable, lhs)(client::ast::expression,
-                                                       rhs))
+BOOST_FUSION_ADAPT_STRUCT(client::ast::assignment,       //
+                          (client::ast::variable, lhs_)  //
+                          (client::ast::expression, rhs_))
 
-BOOST_FUSION_ADAPT_STRUCT(
-    client::ast::if_statement,
-    (client::ast::expression,
-     condition)(client::ast::statement,
-                then)(boost::optional<client::ast::statement>, else_))
+BOOST_FUSION_ADAPT_STRUCT(client::ast::if_statement,             //
+                          (client::ast::expression, condition_)  //
+                          (client::ast::statement, then_)        //
+                          (boost::optional<client::ast::statement>, else_))
 
-BOOST_FUSION_ADAPT_STRUCT(client::ast::while_statement,
-                          (client::ast::expression,
-                           condition)(client::ast::statement, body))
+BOOST_FUSION_ADAPT_STRUCT(client::ast::while_statement,          //
+                          (client::ast::expression, condition_)  //
+                          (client::ast::statement, body_))

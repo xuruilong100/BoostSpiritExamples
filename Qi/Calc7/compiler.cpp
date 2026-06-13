@@ -94,10 +94,10 @@ bool compiler::operator()(double x) const {
 
 bool compiler::operator()(ast::variable const& x) const {
     using enum byte_code;
-    const auto* p = program_.find_var(x.name);
+    const auto* p = program_.find_var(x.name_);
     if (p == nullptr) {
-        std::cout << x.id << std::endl;
-        error_handler_(x.id, "Undeclared variable: " + x.name);
+        std::cout << x.id_ << std::endl;
+        error_handler_(x.id_, "Undeclared variable: " + x.name_);
         return false;
     }
     program_.op(op_load, static_cast<double>(*p));
@@ -131,7 +131,7 @@ bool compiler::operator()(ast::signed_ const& x) const {
     if (!boost::apply_visitor(*this, x.operand_)) {
         return false;
     }
-    switch (x.sign) {
+    switch (x.sign_) {
         case '-':
             program_.op(op_neg);
             break;
@@ -142,10 +142,10 @@ bool compiler::operator()(ast::signed_ const& x) const {
 }
 
 bool compiler::operator()(ast::expression const& x) const {
-    if (!boost::apply_visitor(*this, x.first)) {
+    if (!boost::apply_visitor(*this, x.first_)) {
         return false;
     }
-    for (ast::operation const& oper : x.rest) {
+    for (ast::operation const& oper : x.rest_) {
         if (!(*this)(oper)) {
             return false;
         }
@@ -155,13 +155,13 @@ bool compiler::operator()(ast::expression const& x) const {
 
 bool compiler::operator()(ast::assignment const& x) const {
     using enum byte_code;
-    if (!(*this)(x.rhs)) {
+    if (!(*this)(x.rhs_)) {
         return false;
     }
-    const auto* p = program_.find_var(x.lhs.name);
+    const auto* p = program_.find_var(x.lhs_.name_);
     if (p == nullptr) {
-        std::cout << x.lhs.id << std::endl;
-        error_handler_(x.lhs.id, "Undeclared variable: " + x.lhs.name);
+        std::cout << x.lhs_.id_ << std::endl;
+        error_handler_(x.lhs_.id_, "Undeclared variable: " + x.lhs_.name_);
         return false;
     }
     program_.op(op_store, static_cast<double>(*p));
@@ -170,18 +170,18 @@ bool compiler::operator()(ast::assignment const& x) const {
 
 bool compiler::operator()(ast::variable_declaration const& x) const {
     using enum byte_code;
-    if (const auto* p = program_.find_var(x.assign.lhs.name); p != nullptr) {
-        std::cout << x.assign.lhs.id << std::endl;
-        error_handler_(x.assign.lhs.id,
-                       "Duplicate variable: " + x.assign.lhs.name);
+    if (const auto* p = program_.find_var(x.assign_.lhs_.name_); p != nullptr) {
+        std::cout << x.assign_.lhs_.id_ << std::endl;
+        error_handler_(x.assign_.lhs_.id_,
+                       "Duplicate variable: " + x.assign_.lhs_.name_);
         return false;
     }
 
-    bool r = (*this)(x.assign.rhs);
+    bool r = (*this)(x.assign_.rhs_);
     if (r) {  // don't add the variable if the RHS fails
-        program_.add_var(x.assign.lhs.name);
+        program_.add_var(x.assign_.lhs_.name_);
         program_.op(op_store,
-                    static_cast<double>(*program_.find_var(x.assign.lhs.name)));
+                    static_cast<double>(*program_.find_var(x.assign_.lhs_.name_)));
     }
     return r;
 }

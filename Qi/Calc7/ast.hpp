@@ -27,21 +27,19 @@ namespace client::ast {
 //  The AST
 ///////////////////////////////////////////////////////////////////////////
 struct tagged {
-    std::size_t id;  // Used to annotate the AST with the iterator position.
-                     // This id is used as a key to a map<std::size_t, IT>
-                     // (not really part of the AST.)
+    std::size_t id_;  // Used to annotate the AST with the iterator position.
+                      // This id is used as a key to a map<std::size_t, IT>
+                      // (not really part of the AST.)
 };
 
 struct nil {};
-
 struct signed_;
-
 struct expression;
 
 struct variable : tagged {
     variable() = default;
-    variable(std::string const& name) : name(name) {}
-    std::string name;
+    variable(std::string const& name) : name_(name) {}
+    std::string name_;
 };
 
 using operand = boost::variant<nil,
@@ -51,7 +49,7 @@ using operand = boost::variant<nil,
                                boost::recursive_wrapper<expression>>;
 
 struct signed_ {
-    char sign;
+    char sign_;
     operand operand_;
 };
 
@@ -61,17 +59,17 @@ struct operation {
 };
 
 struct expression {
-    operand first;
-    std::list<operation> rest;
+    operand first_;
+    std::list<operation> rest_;
 };
 
 struct assignment {
-    variable lhs;
-    expression rhs;
+    variable lhs_;
+    expression rhs_;
 };
 
 struct variable_declaration {
-    assignment assign;
+    assignment assign_;
 };
 
 using statement = boost::variant<variable_declaration, assignment>;
@@ -84,26 +82,26 @@ inline std::ostream& operator<<(std::ostream& out, nil) {
     return out;
 }
 inline std::ostream& operator<<(std::ostream& out, variable const& var) {
-    out << var.name;
+    out << var.name_;
     return out;
 }
 }  // namespace client::ast
 
 BOOST_FUSION_ADAPT_STRUCT(client::ast::signed_,  //
-                          (char, sign)           //
+                          (char, sign_)          //
                           (client::ast::operand, operand_))
 
 BOOST_FUSION_ADAPT_STRUCT(client::ast::operation,  //
                           (char, operator_)        //
                           (client::ast::operand, operand_))
 
-BOOST_FUSION_ADAPT_STRUCT(client::ast::expression,       //
-                          (client::ast::operand, first)  //
-                          (std::list<client::ast::operation>, rest))
+BOOST_FUSION_ADAPT_STRUCT(client::ast::expression,        //
+                          (client::ast::operand, first_)  //
+                          (std::list<client::ast::operation>, rest_))
 
 BOOST_FUSION_ADAPT_STRUCT(client::ast::variable_declaration,  //
-                          (client::ast::assignment, assign))
+                          (client::ast::assignment, assign_))
 
-BOOST_FUSION_ADAPT_STRUCT(client::ast::assignment,      //
-                          (client::ast::variable, lhs)  //
-                          (client::ast::expression, rhs))
+BOOST_FUSION_ADAPT_STRUCT(client::ast::assignment,       //
+                          (client::ast::variable, lhs_)  //
+                          (client::ast::expression, rhs_))

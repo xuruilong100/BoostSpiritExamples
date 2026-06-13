@@ -49,28 +49,20 @@ enum class byte_code {
     op_false,   //  push constant 1 into the stack
 
     op_jump_if,  //  jump to a relative position in the code if top stack
-                 //  evaluates to false
-    op_jump,     //  jump to a relative position in the code
+    //  evaluates to false
+    op_jump,  //  jump to a relative position in the code
 
-    op_stk_adj,  // adjust the stack (for args and locals)
-    op_call,     // function call
-    op_return    // return from function
+    op_stk_adj  // adjust the stack (for args and locals)
 };
 
 class vmachine {
    public:
-    explicit vmachine(std::size_t stackSize = 4096) : stack(stackSize) {}
+    explicit vmachine(std::size_t stackSize = 4096) : stack_(stackSize) {}
 
-    double execute(std::vector<double> const& code,         // the program code
-                   std::vector<double>::const_iterator pc,  // program counter
-                   std::vector<double>::iterator
-                       frame_ptr  // start of arguments and locals
-    );
+    void execute(std::vector<double> const& code);
+    const auto& get_stack() const { return stack_; };
 
-    double execute(std::vector<double> const& code) {
-        return execute(code, code.begin(), stack.begin());
-    };
-
-    std::vector<double> stack;
+   private:
+    std::vector<double> stack_;
 };
 }  // namespace client

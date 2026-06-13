@@ -18,7 +18,6 @@
 
 #include <boost/phoenix/operator.hpp>
 #include <boost/spirit/include/qi.hpp>
-#include <iostream>
 
 namespace client {
 namespace qi = boost::spirit::qi;

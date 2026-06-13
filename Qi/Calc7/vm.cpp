@@ -9,68 +9,68 @@
 
 namespace client {
 void vmachine::execute(std::vector<double> const& code) {
-    auto pc = code.begin();
+    auto code_ptr = code.begin();
     auto locals = stack_.begin();
-    stack_ptr_ = stack_.begin();
+    auto stack_ptr = stack_.begin();
 
-    while (pc != code.end()) {
-        auto raw_opcode = *pc;
-        ++pc;
+    while (code_ptr != code.end()) {
+        auto raw_opcode = *code_ptr;
+        ++code_ptr;
         auto opcode = static_cast<byte_code>(raw_opcode);
 
         switch (opcode) {
             using enum byte_code;
             case op_neg:
-                stack_ptr_[-1] = -stack_ptr_[-1];
+                stack_ptr[-1] = -stack_ptr[-1];
                 break;
 
             case op_add:
-                --stack_ptr_;
-                stack_ptr_[-1] += stack_ptr_[0];
+                --stack_ptr;
+                stack_ptr[-1] += stack_ptr[0];
                 break;
 
             case op_sub:
-                --stack_ptr_;
-                stack_ptr_[-1] -= stack_ptr_[0];
+                --stack_ptr;
+                stack_ptr[-1] -= stack_ptr[0];
                 break;
 
             case op_mul:
-                --stack_ptr_;
-                stack_ptr_[-1] *= stack_ptr_[0];
+                --stack_ptr;
+                stack_ptr[-1] *= stack_ptr[0];
                 break;
 
             case op_div:
-                --stack_ptr_;
-                stack_ptr_[-1] /= stack_ptr_[0];
+                --stack_ptr;
+                stack_ptr[-1] /= stack_ptr[0];
                 break;
 
             case op_load: {
-                raw_opcode = *pc;
-                ++pc;
+                raw_opcode = *code_ptr;
+                ++code_ptr;
                 auto idx = static_cast<int>(raw_opcode);
-                *stack_ptr_ = locals[idx];
-                ++stack_ptr_;
+                *stack_ptr = locals[idx];
+                ++stack_ptr;
             } break;
 
             case op_store: {
-                --stack_ptr_;
-                raw_opcode = *pc;
-                ++pc;
+                --stack_ptr;
+                raw_opcode = *code_ptr;
+                ++code_ptr;
                 auto idx = static_cast<int>(raw_opcode);
-                locals[idx] = stack_ptr_[0];
+                locals[idx] = stack_ptr[0];
             } break;
 
             case op_double: {
-                double value = *pc;
-                ++pc;
-                *stack_ptr_ = value;
-                ++stack_ptr_;
+                double value = *code_ptr;
+                ++code_ptr;
+                *stack_ptr = value;
+                ++stack_ptr;
             } break;
 
             case op_stk_adj: {
-                raw_opcode = *pc;
-                ++pc;
-                stack_ptr_ = stack_.begin() + static_cast<int>(raw_opcode);
+                raw_opcode = *code_ptr;
+                ++code_ptr;
+                stack_ptr = stack_.begin() + static_cast<int>(raw_opcode);
             } break;
         }
     }

@@ -21,9 +21,9 @@ int main() {
     auto iter = str.cbegin();
     auto end = str.cend();
     double result;
-    bool r = phrase_parse(iter, end, calc, space, result);
+    bool success = phrase_parse(iter, end, calc, space, result);
 
-    if (r && iter == end) {
+    if (success && iter == end) {
         std::cout << "-------------------------\n";
         std::cout << "Parsing succeeded\n";
         std::cout << "result = " << result << std::endl;

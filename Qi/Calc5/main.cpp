@@ -11,7 +11,6 @@
 
 int main() {
     using namespace client;
-
     using iterator_type = std::string::const_iterator;
     using calculator = calculator<iterator_type>;
     using ast::evaluator;
@@ -29,9 +28,9 @@ int main() {
     auto iter = str.cbegin();
     auto end = str.cend();
     boost::spirit::ascii::space_type space;
-    bool r = phrase_parse(iter, end, calc, space, expr);
+    bool success = phrase_parse(iter, end, calc, space, expr);
 
-    if (r && iter == end) {
+    if (success && iter == end) {
         std::cout << "-------------------------\n";
         std::cout << "Parsing succeeded\n";
         print(expr);
