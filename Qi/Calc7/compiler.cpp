@@ -14,8 +14,9 @@
 namespace client::code_gen {
 const std::size_t* program::find_var(std::string const& name) const {
     auto i = variables_.find(name);
-    if (i == variables_.end())
+    if (i == variables_.end()) {
         return nullptr;
+    }
     return &(i->second);
 }
 
@@ -180,8 +181,8 @@ bool compiler::operator()(ast::variable_declaration const& x) const {
     bool r = (*this)(x.assign_.rhs_);
     if (r) {  // don't add the variable if the RHS fails
         program_.add_var(x.assign_.lhs_.name_);
-        program_.op(op_store,
-                    static_cast<double>(*program_.find_var(x.assign_.lhs_.name_)));
+        program_.op(op_store, static_cast<double>(
+                                  *program_.find_var(x.assign_.lhs_.name_)));
     }
     return r;
 }

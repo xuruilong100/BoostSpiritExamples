@@ -147,10 +147,11 @@ void program::print_assembler() const {
                 ++pc;
                 line += "      op_jump     ";
                 std::size_t pos = std::distance(code_.begin(), pc) + idx;
-                if (pos == code_.size())
+                if (pos == code_.size()) {
                     line += "end";
-                else
+                } else {
                     line += boost::lexical_cast<std::string>(pos);
+                }
                 jumps.insert(pos);
             } break;
 
@@ -159,10 +160,11 @@ void program::print_assembler() const {
                 ++pc;
                 line += "      op_jump_if  ";
                 std::size_t pos = std::distance(code_.begin(), pc) + idx;
-                if (pos == code_.size())
+                if (pos == code_.size()) {
                     line += "end";
-                else
+                } else {
                     line += boost::lexical_cast<std::string>(pos);
+                }
                 jumps.insert(pos);
             } break;
 
@@ -284,8 +286,9 @@ bool compiler::operator()(ast::unary const& x) const {
 }
 
 bool compiler::operator()(ast::expression const& x) const {
-    if (!boost::apply_visitor(*this, x.first_))
+    if (!boost::apply_visitor(*this, x.first_)) {
         return false;
+    }
     for (const auto& oper : x.rest_) {
         if (!(*this)(oper)) {
             return false;
@@ -320,8 +323,8 @@ bool compiler::operator()(ast::variable_declaration const& x) const {
     bool r = (*this)(x.assign_.rhs_);
     if (r) {  // don't add the variable if the RHS fails
         program.add_var(x.assign_.lhs_.name_);
-        program.op(op_store,
-                   static_cast<double>(*program.find_var(x.assign_.lhs_.name_)));
+        program.op(op_store, static_cast<double>(
+                                 *program.find_var(x.assign_.lhs_.name_)));
     }
     return r;
 }
@@ -332,20 +335,23 @@ bool compiler::operator()(ast::statement const& x) const {
 
 bool compiler::operator()(ast::statement_list const& x) const {
     for (const auto& s : x) {
-        if (!(*this)(s))
+        if (!(*this)(s)) {
             return false;
+        }
     }
     return true;
 }
 
 bool compiler::operator()(ast::if_statement const& x) const {
     using enum byte_code;
-    if (!(*this)(x.condition_))
+    if (!(*this)(x.condition_)) {
         return false;
+    }
     program.op(op_jump_if, 0);              // we shall fill this (0) in later
     std::size_t skip = program.size() - 1;  // mark its position
-    if (!(*this)(x.then_))
+    if (!(*this)(x.then_)) {
         return false;
+    }
     program[skip] = static_cast<double>(program.size() - skip);
     // now we know where to jump to (after the if branch)
 
@@ -353,8 +359,9 @@ bool compiler::operator()(ast::if_statement const& x) const {
         program[skip] += 2;      // adjust for the "else" jump
         program.op(op_jump, 0);  // we shall fill this (0) in later
         std::size_t exit = program.size() - 1;  // mark its position
-        if (!(*this)(*x.else_))
+        if (!(*this)(*x.else_)) {
             return false;
+        }
         program[exit] = static_cast<double>(program.size() - exit);
         // now we know where to jump to (after the else branch)
     }
@@ -365,12 +372,14 @@ bool compiler::operator()(ast::if_statement const& x) const {
 bool compiler::operator()(ast::while_statement const& x) const {
     using enum byte_code;
     std::size_t loop = program.size();  // mark our position
-    if (!(*this)(x.condition_))
+    if (!(*this)(x.condition_)) {
         return false;
+    }
     program.op(op_jump_if, 0);              // we shall fill this (0) in later
     std::size_t exit = program.size() - 1;  // mark its position
-    if (!(*this)(x.body_))
+    if (!(*this)(x.body_)) {
         return false;
+    }
     program.op(op_jump,
                static_cast<double>(loop - 1) -
                    static_cast<double>(program.size()));  // loop back

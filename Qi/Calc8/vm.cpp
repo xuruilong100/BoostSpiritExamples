@@ -126,9 +126,9 @@ void vmachine::execute(std::vector<double> const& code) {
                 if (!bool(stack_ptr[-1])) {
                     auto idx = static_cast<int>(*code_ptr);
                     code_ptr += idx;
-                }
-                else
+                } else {
                     ++code_ptr;
+                }
                 --stack_ptr;
             } break;
 

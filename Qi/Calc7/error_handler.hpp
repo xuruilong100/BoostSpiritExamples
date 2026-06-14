@@ -73,10 +73,11 @@ class error_handler {
                 eol = true;
                 line_start = ++i;
             }
-            if (eol)
+            if (eol) {
                 ++line;
-            else
+            } else {
                 ++i;
+            }
         }
         return line_start;
     }
@@ -84,8 +85,9 @@ class error_handler {
     std::string get_line(IT err_pos) const {
         IT i = err_pos;
         // position i to the next EOL
-        while (i != last_ && (*i != '\r' && *i != '\n'))
+        while (i != last_ && (*i != '\r' && *i != '\n')) {
             ++i;
+        }
         return std::string(err_pos, i);
     }
 };
