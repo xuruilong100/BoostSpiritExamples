@@ -1,0 +1,155 @@
+/*=============================================================================
+    Copyright (c) 2001-2011 Joel de Guzman
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================*/
+
+#pragma once
+
+// Spirit v2.5 allows you to suppress automatic generation
+// of predefined terminals to speed up complation. With
+// BOOST_SPIRIT_NO_PREDEFINED_TERMINALS defined, you are
+// responsible in creating instances of the terminals that
+// you need (e.g. see qi::uint_type uint_ below).
+#ifndef BOOST_SPIRIT_NO_PREDEFINED_TERMINALS
+#define BOOST_SPIRIT_NO_PREDEFINED_TERMINALS
+#endif
+
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/optional.hpp>
+#include <boost/variant/recursive_variant.hpp>
+#include <iostream>
+#include <list>
+#include <string>
+
+namespace client::ast {
+///////////////////////////////////////////////////////////////////////////
+//  The AST
+///////////////////////////////////////////////////////////////////////////
+struct tagged {
+    std::size_t id_;  // Used to annotate the AST with the iterator position.
+                      // This id is used as a key to a map<int, IT>
+                      // (not really part of the AST.)
+};
+
+struct nil {};
+struct unary;
+struct expression;
+
+struct variable : tagged {
+    variable() = default;
+    variable(std::string const& name) : name_(name) {}
+    std::string name_;
+};
+
+using operand = boost::variant<nil,
+                               bool,
+                               double,
+                               variable,
+                               boost::recursive_wrapper<unary>,
+                               boost::recursive_wrapper<expression>>;
+
+enum class optoken {
+    op_plus,
+    op_minus,
+    op_times,
+    op_divide,
+    op_positive,
+    op_negative,
+    op_not,
+    op_equal,
+    op_not_equal,
+    op_less,
+    op_less_equal,
+    op_greater,
+    op_greater_equal,
+    op_and,
+    op_or
+};
+
+struct unary {
+    optoken operator_;
+    operand operand_;
+};
+
+struct operation {
+    optoken operator_;
+    operand operand_;
+};
+
+struct expression {
+    operand first_;
+    std::list<operation> rest_;
+};
+
+struct assignment {
+    variable lhs_;
+    expression rhs_;
+};
+
+struct variable_declaration {
+    assignment assign_;
+};
+
+struct if_statement;
+struct while_statement;
+struct statement_list;
+
+using statement = boost::variant<variable_declaration,
+                                 assignment,
+                                 boost::recursive_wrapper<if_statement>,
+                                 boost::recursive_wrapper<while_statement>,
+                                 boost::recursive_wrapper<statement_list>>;
+
+struct statement_list : std::list<statement> {};
+
+struct if_statement {
+    expression condition_;
+    statement then_;
+    boost::optional<statement> else_;
+};
+
+struct while_statement {
+    expression condition_;
+    statement body_;
+};
+
+// print functions for debugging
+inline std::ostream& operator<<(std::ostream& out, nil) {
+    out << "nil";
+    return out;
+}
+inline std::ostream& operator<<(std::ostream& out, variable const& var) {
+    out << var.name_;
+    return out;
+}
+}  // namespace client::ast
+
+BOOST_FUSION_ADAPT_STRUCT(client::ast::unary,                //
+                          (client::ast::optoken, operator_)  //
+                          (client::ast::operand, operand_))
+
+BOOST_FUSION_ADAPT_STRUCT(client::ast::operation,            //
+                          (client::ast::optoken, operator_)  //
+                          (client::ast::operand, operand_))
+
+BOOST_FUSION_ADAPT_STRUCT(client::ast::expression,        //
+                          (client::ast::operand, first_)  //
+                          (std::list<client::ast::operation>, rest_))
+
+BOOST_FUSION_ADAPT_STRUCT(client::ast::variable_declaration,  //
+                          (client::ast::assignment, assign_))
+
+BOOST_FUSION_ADAPT_STRUCT(client::ast::assignment,       //
+                          (client::ast::variable, lhs_)  //
+                          (client::ast::expression, rhs_))
+
+BOOST_FUSION_ADAPT_STRUCT(client::ast::if_statement,             //
+                          (client::ast::expression, condition_)  //
+                          (client::ast::statement, then_)        //
+                          (boost::optional<client::ast::statement>, else_))
+
+BOOST_FUSION_ADAPT_STRUCT(client::ast::while_statement,          //
+                          (client::ast::expression, condition_)  //
+                          (client::ast::statement, body_))

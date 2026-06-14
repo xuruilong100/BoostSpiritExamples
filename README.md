@@ -9,8 +9,11 @@ some Boost.Spirit examples
 - [x] Calc4
 - [x] Calc5
 - [x] Calc6
+- [x] Calc6_1 
 - [x] Calc7
+- [x] Clac7_1
 - [x] Calc8
+- [x] Calc8_1
 - [ ] Conjure1
 - [ ] Conjure2
 - [ ] Conjure3
